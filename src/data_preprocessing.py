@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 def data_preprocessing(df):
 
     # Add flag column for missing values
@@ -8,16 +7,14 @@ def data_preprocessing(df):
         if df[col].isnull().sum() > 0:
             df[col+"_missing_flag"] = df[col].isnull()
 
-    df[col+"_missing_flag"] = [df[col].isnull() \
-                            for col in df.columns \
-                            if df[col].isna().sum() > 0]
-
     # Drop the columns where one category contains more than 90% values
-    drop_cols = {}
+    drop_cols = set()
     for col in df.columns:
         missing_share = df[col].isnull().sum()/df.shape[0]
         if missing_share > 0.9:
             drop_cols.add(col)
+
+    good_cols = [col for col in df.columns if col not in drop_cols]
 
     # Drop the columns which have only one unique value    
     for col in good_cols:
@@ -29,9 +26,8 @@ def data_preprocessing(df):
 
     return df[good_cols]
 
-if __name__ == '___main__':
+if __name__ == "__main__":
 
-    print("Starting Preprocessing")
     df_id = pd.read_csv("input/train_identity.csv")
     df_tran = pd.read_csv("input/train_transaction.csv")
     df = df_tran.merge(df_id, how='left', on='TransactionID')
