@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn import model_selection
-
+import gc
 
 
 class CrossValidationSplit:
@@ -33,6 +33,7 @@ class CrossValidationSplit:
         return self.data
 
 
+
     def train_test_cv_split(self):
 
         X = self.data.drop(self.target)
@@ -56,6 +57,10 @@ if __name__ == "__main__":
     df_id = pd.read_csv("input/train_identity.csv")
     df_tran = pd.read_csv("input/train_transaction.csv")
     df = df_tran.merge(df_id, how='left', on='TransactionID')
+
+    del df_tran, df_id
+    gc.collect()
+
     print(df.head())
     cv = CrossValidationSplit(df, ['isFraud'], shuffle = True, num_folds = 5, train_test_cv_split = False, random_state = 42)
     df_split = cv.K_fold_split()
